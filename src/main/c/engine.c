@@ -18,7 +18,7 @@ void engine( int *instruction_stack,
 	
 	switch(*sp_instruction++)
 	{
-#      include "stack_accessors.c"
+#      include "stack-accessors.c"
 #      include "execution-engine.c"
 	default:
 		fprintf(stderr,"unknown instruction %d at %p\n", sp_instruction[ -1 ], sp_instruction - 1);
