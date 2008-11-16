@@ -1,6 +1,6 @@
 require File.join( File.dirname(__FILE__), 'magenta', 'magenta.rb' )
 
-my_instruction_set = InstructionSet.define do 
+my_instruction_set = Magenta::InstructionSet.define do 
   
   data_type "integer", "i", "int"
   data_type "word", "w", "int"
