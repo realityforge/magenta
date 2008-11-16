@@ -55,7 +55,7 @@ int main(int argc, char **argv)
   data_stack_t *data_stack = (data_stack_t *)calloc( STACK_SIZE, sizeof(data_stack_t) );
 
 #ifdef VM_DEBUG
- vm_debug = 0;
+ vm_debug = 1;
 vm_out = stderr;
 #endif
 
