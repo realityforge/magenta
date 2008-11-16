@@ -2,6 +2,9 @@ RUBY=ruby
 
 main: target/magenta
 
+clean:
+	rm -rf target generated
+
 generated: 
 	mkdir -p generated
 
