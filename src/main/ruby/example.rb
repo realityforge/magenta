@@ -5,8 +5,8 @@ my_instruction_set = Magenta::InstructionSet.define do
   data_type "integer", "i", "int"
   data_type "word", "w", "int"
   
-  #stack "instruction", "#", "word"
-  stack "instruction", "#", "integer"
+  stack "instruction", "#", "word"
+  #stack "instruction", "#", "integer"
   stack "data", "%", "integer", :default => true
   
   instruction "exit", [], [] do |i|

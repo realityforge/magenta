@@ -13,12 +13,25 @@ module Magenta
       end
 
       def generate_declarations(writer,instruction_set)
-        instruction_set.data_types.each_value do |stack|
-          generate_data_type_declaration(writer,stack)
+
+        # generate typedefs for data_types
+        instruction_set.data_types.each_value do |data_type|
+          generate_data_type_declaration(writer,data_type)
         end
+        
+        # generate typedefs for stacks
         instruction_set.stacks.each_value do |stack|
           generate_stack_declaration(writer,stack)
         end
+        
+        # generate converter macros between types
+        instruction_set.data_types.each_value do |source|
+          instruction_set.data_types.each_value do |destination|
+            generate_data_type_converter(writer,source,destination)
+          end
+        end
+        
+        # generate printing prototypes for debugging/disassembling
         writer.write "#if (VM_DEBUG || VM_DISASSEMBLER)\n"
         instruction_set.data_types.each_value do |stack|
           generate_data_type_debug(writer,stack)
@@ -58,6 +71,22 @@ GEN
           end
           
           writer.write "\n\n"
+        end
+      end
+
+      def generate_data_type_converter(writer,source,destination)
+        converter_code = source.converters[destination.name]
+        unless converter_code
+          converter_code = "source" if source.c_type == destination.c_type
+        end
+      
+        if converter_code
+          writer.write <<-GEN 
+static inline #{destination.to_native_type} vm_convert_#{source.name}_to_#{destination.name}(const #{source.to_native_type} source)          
+{
+  return #{converter_code};
+}
+GEN
         end
       end
 

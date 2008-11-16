@@ -4,6 +4,15 @@ module Magenta
     attr_accessor :name
     attr_accessor :prefix
     attr_accessor :c_type
+    attr_accessor :converters
+    
+    def initialize
+      @converters = {}
+    end
+    
+    def converter(name,code)
+      @converters[name] = code
+    end
 
     def to_native_type
       "#{name}_data_type_t"
@@ -92,12 +101,13 @@ module Magenta
     #
     # data_type "integer", "i", "int"
     #
-    def data_type(name, prefix,c_type)
+    def data_type(name, prefix, c_type, &block)
       dt = DataType.new
       dt.name = name
       dt.prefix = prefix
       dt.c_type = c_type
       @data_types[prefix] = dt
+      yield dt if block
       dt
     end
 
