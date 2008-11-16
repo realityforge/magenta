@@ -1,10 +1,10 @@
 module Magenta
   module Generator
 
-    class ExecutionEngine
+    class Interpreter
       def self.generate(base_filename,instruction_set)
         g = self.new
-        File.open("#{base_filename}execution-engine.inc","w") do |f|
+        File.open("#{base_filename}interpreter.inc","w") do |f|
           g.generate_execution_engine(f,instruction_set)
         end
       end

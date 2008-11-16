@@ -18,7 +18,7 @@ void engine( instruction_stack_t *instruction_stack, data_stack_t *data_stack )
 		switch(*sp_instruction++)
 		{
 #			include "stack-accessors.inc"
-#			include "execution-engine.inc"
+#			include "interpreter.inc"
 		default:
 		    panic("Unknown instruction %d at %p\n", sp_instruction[ -1 ], sp_instruction - 1);
 		}

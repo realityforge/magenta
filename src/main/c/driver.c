@@ -43,7 +43,7 @@ static inline void instruction_append(instruction_stack_t **instructions, const 
 
 #define IB_API static inline
 #define INSTRUCTION_CODE(bytecode) bytecode
-#include "instruction-builder.inc"
+#include "assembler.inc"
 
 #define CODE_SIZE 65536
 #define STACK_SIZE 65536
