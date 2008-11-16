@@ -15,7 +15,7 @@ generated:
 target: 
 	mkdir -p target
 	
-$(RUBY_DIR)/example.rb: $(RUBY_DIR)/magenta/magenta.rb $(RUBY_DIR)/magenta/model.rb $(RUBY_DIR)/magenta/generator/builder.rb $(RUBY_DIR)/magenta/generator/common.rb $(RUBY_DIR)/magenta/generator/execution_engine.rb
+$(RUBY_DIR)/example.rb: $(RUBY_DIR)/magenta/magenta.rb $(RUBY_DIR)/magenta/model.rb $(RUBY_DIR)/magenta/generator/assembler.rb $(RUBY_DIR)/magenta/generator/common.rb $(RUBY_DIR)/magenta/generator/execution_engine.rb $(RUBY_DIR)/magenta/generator/disassembler.rb
 	touch $(RUBY_DIR)/example.rb
 
 generated/execution-engine.c: $(RUBY_DIR)/example.rb generated

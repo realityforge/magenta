@@ -1,7 +1,7 @@
 module Magenta
   module Generator
 
-    class Builder
+    class Assembler
       def self.generate(base_filename,instruction_set)
         g = self.new
         File.open("#{base_filename}instruction-builder.inc","w") do |f|
