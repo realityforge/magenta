@@ -27,6 +27,7 @@ private
     DBG_START_INSTRUCTION(#{instruction.name});
 GEN
         instruction_set.stacks.each_value do |stack|
+          next if stack.instruction_stack?
           writer.write <<-GEN
     DBG_STACK_POINTER(#{stack.name});
 GEN

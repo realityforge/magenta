@@ -8,10 +8,10 @@
 extern int vm_debug;
 extern FILE* vm_out;
 
-#  define DBG_START_INSTRUCTION(name) if (vm_debug) {fprintf(vm_out, "%p: %-20s", sp_instruction-1, #name);}
+#  define DBG_START_INSTRUCTION(name) if (vm_debug) {fprintf(vm_out, "%p: %-20s ", sp_instruction-1, #name);}
 #  define DBG_STACK_POINTER(name) if (vm_debug) {fprintf(vm_out, #name "=%p ", sp_##name - 1);}
-#  define DBG_ARG(name,type) if (vm_debug) {fputs(" " #name "=", vm_out); printarg_##type(vm_out,name);}
-#  define DBG_STACK_EFFECT_SEPARATOR if (vm_debug) {fputs(" --", vm_out);}
+#  define DBG_ARG(name,type) if (vm_debug) {fputs(#name "=", vm_out); printarg_##type(vm_out,name); fputc(' ', vm_out);}
+#  define DBG_STACK_EFFECT_SEPARATOR if (vm_debug) {fputs("-- ", vm_out);}
 #  define DBG_END_INSTRUCTION if (vm_debug) {fputc('\n', vm_out);}
 
 #else

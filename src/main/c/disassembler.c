@@ -3,6 +3,10 @@
 #define START_INSTRUCTION(name,bytecode) case bytecode: //#name bytecode:
 #define END_INSTRUCTION break;
 
+#define PRINT_INSTRUCTION(name) fprintf(vm_out, "%p: %-20s ", sp_instruction - 1, #name);
+#define PRINT_IMMEDIATE(name,type) {fputs( #name "=", vm_out); printarg_##type(vm_out,name); fputc(' ', vm_out);}
+#define PRINT_INSTRUCTION_END {fputc('\n', vm_out);}
+
 void disassembler( FILE *vm_out, instruction_stack_t *instruction_stack )
 {
 	int *sp_instruction = instruction_stack;
