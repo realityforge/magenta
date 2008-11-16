@@ -19,7 +19,7 @@ module Magenta
   end
 
   class Instruction
-    attr_accessor :code
+    attr_accessor :bytecode
     attr_accessor :name
     attr_accessor :description
     attr_accessor :code
@@ -45,7 +45,7 @@ module Magenta
     end
   
     def initialize
-      @next_instruction_code = 0
+      @next_instruction_bytecode = 0
       @instructions = []
       @data_types = {}
       @stacks = {}
@@ -96,8 +96,8 @@ module Magenta
     def instruction(name,stack_before,stack_after)
       i =  Instruction.new
       i.name = name
-      i.code = @next_instruction_code
-      @next_instruction_code = @next_instruction_code + 1
+      i.bytecode = @next_instruction_bytecode
+      @next_instruction_bytecode = @next_instruction_bytecode + 1
       i.stack_before = stack_before.collect { |se| parse_stack_entry(se) }
       i.stack_after = stack_after.collect { |se| parse_stack_entry(se) }
       yield i
@@ -115,7 +115,7 @@ module Magenta
       type_prefix = description[type_index,1]
       entry_type = @data_types[type_prefix]
       raise "Unknown type prefix for '#{description}'" unless entry_type
-      name = description[type_index,1]
+      name = description[type_index,description.length - type_index]
       se = StackEntry.new
       se.stack = stack
       se.entry_type = entry_type

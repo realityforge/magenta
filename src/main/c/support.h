@@ -1,6 +1,9 @@
 
 #ifdef VM_DEBUG
 
+extern int vm_debug;
+extern FILE* vm_out;
+
 #  define DBG_START_INSTRUCTION(name) if (vm_debug) {fprintf(vm_out, "%p: %-20s", ip-1, #name);}
 #  define DBG_STACK_POINTER(name) if (vm_debug) {fprintf(vm_out, #name "=%p", sp_##name);}
 #  define DBG_ARG(name,type) if (vm_debug) {fputs(" " #name "=", vm_out); printarg_##type(vm_out,name);}

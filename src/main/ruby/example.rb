@@ -50,4 +50,4 @@ my_instruction_set = Magenta::InstructionSet.define do
   
 end
 
-Magenta::Generator::ExecutionEngine.generate("generated/Engine.gen.c",my_instruction_set)
+Magenta::Generator::ExecutionEngine.generate("generated/",my_instruction_set)

@@ -3,31 +3,70 @@ module Magenta
 
     class ExecutionEngine
       def self.generate(filename,instruction_set)
-        File.open(filename,"w") do |f|
-          self.new.generate(f,instruction_set)
+        g = self.new
+        File.open("#{filename}execution-engine.c","w") do |f|
+          g.generate_execution_engine(f,instruction_set)
+        end
+        File.open("#{filename}instruction-table.c","w") do |f|
+          g.generate_instruction_table(f,instruction_set)
+        end
+        File.open("#{filename}stack_accessors.c","w") do |f|
+          g.generate_stack_accessors(f,instruction_set)
         end
       end
   
-      def generate(writer,instruction_set)
+      def generate_execution_engine(writer,instruction_set)
         instruction_set.instructions.each do |instruction|
-          generate_instruction(writer,instruction_set,instruction)
+          generate_instruction_executor(writer,instruction_set,instruction)
+        end
+      end
+
+      def generate_instruction_table(writer,instruction_set)
+        instruction_set.instructions.each do |instruction|
+          writer.write <<-GEN
+INSTRUCTION_ENTRY(#{instruction.name}, #{instruction.bytecode})
+GEN
+        end
+      end
+
+      def generate_stack_accessors(writer,instruction_set)
+        instruction_set.stacks.each_value do |stack|
+          generate_stack_accessor(writer,stack)
+        end
+      end
+
+private
+      def generate_stack_accessor(writer,stack)
+        # TODO: Support caching of N items (where N is 0->6) in variables rather than 
+        # on stack. To avoid copying between stack and variables we can keep a state
+        # variable for interpreter and duplicate the code to execute instructions for 
+        # each different state (i.e. GET_X_STACK_ITEM_Y is redefined in each state).
+        # This can probably only be done with the default stack to aovid code explosion
+        (0..5).each do |index|
+          accessor = "GET_#{stack.name}_STACK_ITEM_#{index}"
+          writer.write <<-GEN
+#ifdef #{accessor}
+#  undef #{accessor}
+#endif
+#define #{accessor}() (sp_#{stack.name}[#{index}])
+
+
+GEN
         end
       end
   
-      private
-  
-      def generate_instruction(writer,instruction_set,instruction)
+      def generate_instruction_executor(writer,instruction_set,instruction)
         writer.write <<-GEN
   /* 
     #{instruction.description}
   */
-  LABEL(#{instruction.name})
+  START_INSTRUCTION(#{instruction.name})
   {
-    DBG_START_INSTRUCTION(#{instruction.name})
+    DBG_START_INSTRUCTION(#{instruction.name});
 GEN
         instruction_set.stacks.each_value do |stack|
           writer.write <<-GEN
-    DBG_STACK_POINTER(#{stack.name}
+    DBG_STACK_POINTER(#{stack.name});
 GEN
         end
 
@@ -38,7 +77,7 @@ GEN
           converter = (entry_type.name == stack_type) ? "" : "vm_convert_#{stack_type}_to_#{entry_type.name}"
           writer.write <<-GEN
     const #{entry_type.c_type} #{stack_entry.name} = #{converter}(GET_#{stack.name}_STACK_ITEM_#{index}());
-    DBG_ARG(#{stack_entry.name},#{entry_type.name})
+    DBG_ARG(#{stack_entry.name},#{entry_type.name});
 GEN
         end
 
@@ -49,11 +88,11 @@ GEN
         end
 
         writer.write <<-GEN
-    DBG_STACK_EFFECT_SEPARATOR
+    DBG_STACK_EFFECT_SEPARATOR;
 GEN
         instruction_set.stacks.each_value do |stack|
           stack_diff = instruction.stack_diff(stack)
-          writer.write "    sp_#{stack.name} += #{stack_diff}\n" unless stack_diff == 0
+          writer.write "    sp_#{stack.name} += #{stack_diff};\n" unless stack_diff == 0
         end
 
         # TODO: Should put in preprocessor directives to indicate the source
@@ -65,6 +104,7 @@ GEN
     {
       #{instruction.code};
     }
+    PREFETCH_NEXT_INSTRUCTION;
 GEN
         instruction.stack_after.reverse.each_with_index do |stack_entry, index|
           entry_type = stack_entry.entry_type
@@ -72,13 +112,14 @@ GEN
           stack_type = stack.element_type.name
           converter = (entry_type.name == stack_type) ? "" : "vm_convert_#{entry_type.name}_to_#{stack_type}"
           writer.write <<-GEN
-    PUT_#{stack.name}_STACK_ITEM_#{index}(#{converter}(#{stack_entry.name}))
-    DBG_ARG(#{stack_entry.name},#{entry_type.name})
+    PUT_#{stack.name}_STACK_ITEM_#{index}(#{converter}(#{stack_entry.name}));
+    DBG_ARG(#{stack_entry.name},#{entry_type.name});
 GEN
         end
 
         writer.write <<-GEN
-    DBG_END_INSTRUCTION
+    DBG_END_INSTRUCTION;
+    END_INSTRUCTION;
   }
 
 
