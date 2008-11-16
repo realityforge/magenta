@@ -19,18 +19,3 @@ extern FILE* vm_out;
 #  define DBG_END_INSTRUCTION
 
 #endif
-
-
-#define GET_STACK_ITEM_0() sp[0]
-#define GET_STACK_ITEM_1() sp[1]
-#define GET_STACK_ITEM_2() sp[2]
-#define GET_STACK_ITEM_3() sp[3]
-#define GET_STACK_ITEM_4() sp[4]
-#define GET_STACK_ITEM_5() sp[5]
-
-#define PUT_STACK_ITEM_0(value) sp[0] = value
-#define PUT_STACK_ITEM_1(value) sp[1] = value
-#define PUT_STACK_ITEM_2(value) sp[2] = value
-#define PUT_STACK_ITEM_3(value) sp[3] = value
-#define PUT_STACK_ITEM_4(value) sp[4] = value
-#define PUT_STACK_ITEM_5(value) sp[5] = value

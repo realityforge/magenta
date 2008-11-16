@@ -7,10 +7,7 @@ module Magenta
         File.open("#{filename}execution-engine.c","w") do |f|
           g.generate_execution_engine(f,instruction_set)
         end
-        File.open("#{filename}instruction-table.c","w") do |f|
-          g.generate_instruction_table(f,instruction_set)
-        end
-        File.open("#{filename}stack_accessors.c","w") do |f|
+        File.open("#{filename}stack-accessors.c","w") do |f|
           g.generate_stack_accessors(f,instruction_set)
         end
       end
@@ -18,14 +15,6 @@ module Magenta
       def generate_execution_engine(writer,instruction_set)
         instruction_set.instructions.each do |instruction|
           generate_instruction_executor(writer,instruction_set,instruction)
-        end
-      end
-
-      def generate_instruction_table(writer,instruction_set)
-        instruction_set.instructions.each do |instruction|
-          writer.write <<-GEN
-INSTRUCTION_ENTRY(#{instruction.name}, #{instruction.bytecode})
-GEN
         end
       end
 
@@ -44,11 +33,17 @@ private
         # This can probably only be done with the default stack to aovid code explosion
         (0..5).each do |index|
           accessor = "GET_#{stack.name}_STACK_ITEM_#{index}"
+          mutator = "PUT_#{stack.name}_STACK_ITEM_#{index}"
           writer.write <<-GEN
 #ifdef #{accessor}
 #  undef #{accessor}
 #endif
 #define #{accessor}() (sp_#{stack.name}[#{index}])
+
+#ifdef #{mutator}
+#  undef #{mutator}
+#endif
+#define #{mutator}(value) (sp_#{stack.name}[#{index}] = value)
 
 
 GEN
@@ -60,7 +55,7 @@ GEN
   /* 
     #{instruction.description}
   */
-  START_INSTRUCTION(#{instruction.name})
+  START_INSTRUCTION(#{instruction.name},#{instruction.bytecode})
   {
     DBG_START_INSTRUCTION(#{instruction.name});
 GEN

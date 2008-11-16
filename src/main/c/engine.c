@@ -6,7 +6,7 @@
 int vm_debug;
 FILE* vm_out;
 
-#define START_INSTRUCTION(name) name##_bytecode:
+#define START_INSTRUCTION(name,bytecode) case bytecode: //#name bytecode:
 #define PREFETCH_NEXT_INSTRUCTION
 #define END_INSTRUCTION
 
