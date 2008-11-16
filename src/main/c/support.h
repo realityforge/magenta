@@ -30,6 +30,11 @@ extern FILE* vm_out;
 #define MAYBE_UNUSED
 #endif
 
+extern char *program_name;
+extern FILE *yyin;
+extern instruction_stack_t *vmcodep;
+extern int yyparse();
+
 extern void panic(const char * format, ...);
 extern void engine( instruction_stack_t *instruction_stack, data_stack_t *data_stack );
 

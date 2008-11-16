@@ -1,4 +1,7 @@
 RUBY=ruby
+LEX=flex -l
+YACC=bison -y
+
 DEFINES=-DVM_DEBUG -DVM_DISASSEMBLER
 
 RUBY_DIR=src/main/ruby
@@ -26,6 +29,12 @@ generated/stack-accessors.c: $(RUBY_DIR)/example.rb generated
 
 generated/declarations.h: $(RUBY_DIR)/example.rb generated
 	$(RUBY) $(RUBY_DIR)/example.rb
-	
-target/magenta: target generated/declarations.h generated/stack-accessors.c generated/execution-engine.c $(C_DIR)/driver.c  $(C_DIR)/engine.c  $(C_DIR)/support.h $(C_DIR)/disassembler.c 
-	gcc $(DEFINES) -o target/magenta $(C_DIR)/engine.c $(C_DIR)/driver.c $(C_DIR)/disassembler.c -Wall -Werror -I generated
+
+generated/scanner.inc: $(C_DIR)/example.l generated
+	$(LEX) -o generated/scanner.inc $(C_DIR)/example.l 
+
+generated/parser.c: $(C_DIR)/example.y
+	$(YACC) -o generated/parser.c $(C_DIR)/example.y
+
+target/magenta: target generated/declarations.h generated/stack-accessors.c generated/execution-engine.c $(C_DIR)/driver.c  $(C_DIR)/engine.c  $(C_DIR)/support.h $(C_DIR)/disassembler.c generated/scanner.inc generated/parser.c
+	gcc $(DEFINES) -o target/magenta generated/parser.c $(C_DIR)/engine.c $(C_DIR)/driver.c $(C_DIR)/disassembler.c -Wall -I generated -I $(C_DIR)

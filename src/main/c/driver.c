@@ -28,28 +28,26 @@ void panic(const char * format, ...)
   exit(1);
 }
 
-#define INSTRUCTION(name,bytecode)
-#include "instruction-table.inc"
-#undef INSTRUCTION
+//#include "assembler.c"
 
-static inline void instruction_append(instruction_stack_t **instructions, const integer_data_type_t value)
-{
-	**instructions = value;
-#ifdef VM_DEBUG
-	if (vm_debug) {fprintf(vm_out,"%p: %d\n",*instructions, **instructions);}
-#endif
-	(*instructions)++;
-}
-
-#define IB_API static inline
-#define INSTRUCTION_CODE(bytecode) bytecode
-#include "assembler.inc"
+char *program_name;
+FILE *yyin;
 
 #define CODE_SIZE 65536
 #define STACK_SIZE 65536
 
 int main(int argc, char **argv)
 {
+	if( argc != 2 )
+	{
+		panic("Expected filename parameter to command missing.");
+	}
+    program_name = argv[1];
+  if ((yyin=fopen(program_name,"r"))==NULL) {
+    perror(program_name);
+    exit(1);
+  }
+	
   instruction_stack_t *instruction_stack = 
     (instruction_stack_t *)calloc( CODE_SIZE, sizeof(instruction_stack_t) );
   data_stack_t *data_stack = (data_stack_t *)calloc( STACK_SIZE, sizeof(data_stack_t) );
@@ -59,6 +57,13 @@ int main(int argc, char **argv)
 vm_out = stderr;
 #endif
 
+  vmcodep = instruction_stack;
+  
+  if ( yyparse() ) exit(1);
+
+  *(vmcodep + 1) = 0;
+
+#if 0
   instruction_stack[0] = 0;
     instruction_stack_t *instructions = instruction_stack;
   
@@ -67,6 +72,8 @@ vm_out = stderr;
 	gen_addi(&instructions);
 	gen_printi(&instructions);
 	gen_exit(&instructions);
+
+#endif
 
 #ifdef VM_DISASSEMBLER
 	disassembler( stderr, instruction_stack );

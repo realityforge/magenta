@@ -34,6 +34,11 @@ my_instruction_set = Magenta::InstructionSet.define do
     i.code = "iC = iA - iB"
   end
 
+  instruction "muli", ["iA","iB"], ["iC"] do |i|
+    i.description = "Multiple one integer by another."
+    i.code = "iC = iA * iB"
+  end
+
   instruction "divi", ["iA","iB"], ["iC"] do |i|
     i.description = "Divide one integer by another."
     i.code = "iC = iA / iB"
