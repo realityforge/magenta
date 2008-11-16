@@ -56,4 +56,5 @@ my_instruction_set = Magenta::InstructionSet.define do
   
 end
 
+Magenta::Generator::Common.generate("generated/",my_instruction_set)
 Magenta::Generator::ExecutionEngine.generate("generated/",my_instruction_set)

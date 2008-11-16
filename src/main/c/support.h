@@ -19,3 +19,5 @@ extern FILE* vm_out;
 #  define DBG_END_INSTRUCTION
 
 #endif
+
+extern void panic(const char * format, ...);

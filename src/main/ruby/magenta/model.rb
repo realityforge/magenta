@@ -35,6 +35,7 @@ module Magenta
   end
 
   class InstructionSet
+    attr_reader :data_types
     attr_reader :stacks
     attr_reader :instructions
   

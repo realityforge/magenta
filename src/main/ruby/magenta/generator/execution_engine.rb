@@ -2,16 +2,13 @@ module Magenta
   module Generator
 
     class ExecutionEngine
-      def self.generate(filename,instruction_set)
+      def self.generate(base_filename,instruction_set)
         g = self.new
-        File.open("#{filename}execution-engine.c","w") do |f|
+        File.open("#{base_filename}execution-engine.c","w") do |f|
           g.generate_execution_engine(f,instruction_set)
         end
-        File.open("#{filename}stack-accessors.c","w") do |f|
+        File.open("#{base_filename}stack-accessors.c","w") do |f|
           g.generate_stack_accessors(f,instruction_set)
-        end
-        File.open("#{filename}declarations.h","w") do |f|
-          g.generate_declarations(f,instruction_set)
         end
       end
   
@@ -27,19 +24,7 @@ module Magenta
         end
       end
 
-      def generate_declarations(writer,instruction_set)
-        instruction_set.stacks.each_value do |stack|
-          generate_stack_declaration(writer,stack)
-        end
-      end
-
 private
-      def generate_stack_declaration(writer,stack)
-          writer.write <<-GEN
-typedef #{stack.element_type.c_type} #{stack.name}_stack_t;          
-GEN
-      end
-
       def generate_stack_accessor(writer,stack)
         # TODO: Support caching of N items (where N is 0->6) in variables rather than 
         # on stack. To avoid copying between stack and variables we can keep a state
