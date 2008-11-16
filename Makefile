@@ -1,4 +1,5 @@
 RUBY=ruby
+DEFINES=-DVM_DEBUG
 
 main: target/magenta
 
@@ -21,4 +22,4 @@ generated/declarations.h: src/main/ruby/example.rb generated
 	$(RUBY) src/main/ruby/example.rb
 	
 target/magenta: target generated/declarations.h generated/stack-accessors.c generated/execution-engine.c src/main/c/driver.c src/main/c/engine.c src/main/c/support.h
-	gcc -o target/magenta src/main/c/engine.c src/main/c/driver.c -I generated/
+	gcc $(DEFINES) -o target/magenta src/main/c/engine.c src/main/c/driver.c -Wall -I generated/

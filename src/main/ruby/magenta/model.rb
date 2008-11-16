@@ -4,6 +4,10 @@ module Magenta
     attr_accessor :name
     attr_accessor :prefix
     attr_accessor :c_type
+
+    def to_native_type
+      "#{name}_data_type_t"
+    end
   end
 
   class Stack

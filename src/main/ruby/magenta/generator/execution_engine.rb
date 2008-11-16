@@ -71,14 +71,14 @@ GEN
           stack_type = stack.element_type.name
           converter = (entry_type.name == stack_type) ? "" : "vm_convert_#{stack_type}_to_#{entry_type.name}"
           writer.write <<-GEN
-    const #{entry_type.c_type} #{stack_entry.name} = #{converter}(GET_#{stack.name}_STACK_ITEM_#{index}());
+    MAYBE_UNUSED const #{entry_type.to_native_type} #{stack_entry.name} = #{converter}(GET_#{stack.name}_STACK_ITEM_#{index}());
     DBG_ARG(#{stack_entry.name},#{entry_type.name});
 GEN
         end
 
         instruction.stack_after.reverse.each do |stack_entry|
           writer.write <<-GEN
-    #{stack_entry.entry_type.c_type} #{stack_entry.name};
+    #{stack_entry.entry_type.to_native_type} #{stack_entry.name};
 GEN
         end
 

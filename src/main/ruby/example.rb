@@ -58,3 +58,4 @@ end
 
 Magenta::Generator::Common.generate("generated/",my_instruction_set)
 Magenta::Generator::ExecutionEngine.generate("generated/",my_instruction_set)
+Magenta::Generator::Builder.generate("generated/",my_instruction_set)
