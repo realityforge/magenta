@@ -50,6 +50,12 @@ class InstructionSet
     @default_stack = nil
   end
   
+  #  
+  # i.e
+  #
+  # stack "instruction", "#", "word"
+  # stack "data", "%", "integer", :default => true
+  #
   def stack(name,prefix,element_type_name,options = {})
     stack = Stack.new
     stack.name = name
@@ -63,6 +69,11 @@ class InstructionSet
     stack
   end
   
+  #  
+  # i.e
+  #
+  # data_type "integer", "i", "int"
+  #
   def data_type(name, prefix,c_type)
     dt = DataType.new
     dt.name = name
@@ -71,7 +82,9 @@ class InstructionSet
     @data_types[prefix] = dt
     dt
   end
-  
+
+  #  
+  # i.e
   #
   # instruction "add", ["iA","iB"], ["iC"] do |i|
   #   i.description = "Add two integers together."
