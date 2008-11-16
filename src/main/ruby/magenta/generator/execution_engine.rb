@@ -31,7 +31,7 @@ private
         # variable for interpreter and duplicate the code to execute instructions for 
         # each different state (i.e. GET_X_STACK_ITEM_Y is redefined in each state).
         # This can probably only be done with the default stack to aovid code explosion
-        (0..5).each do |index|
+        (0..Magenta::Instruction::MAX_STACK_ENTRY_COUNT).each do |index|
           accessor = "GET_#{stack.name}_STACK_ITEM_#{index}"
           mutator = "PUT_#{stack.name}_STACK_ITEM_#{index}"
           writer.write <<-GEN

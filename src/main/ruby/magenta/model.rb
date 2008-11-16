@@ -23,6 +23,8 @@ module Magenta
   end
 
   class Instruction
+    MAX_STACK_ENTRY_COUNT = 5
+    
     attr_accessor :bytecode
     attr_accessor :name
     attr_accessor :description
@@ -57,7 +59,10 @@ module Magenta
       @default_stack = nil
     end
   
-    #  
+    # 
+    # NOTE: There MUST be an instruction stack named "instruction". There should also be
+    # at least one other stack with default flag set to true.  
+    # 
     # i.e
     #
     # stack "instruction", "#", "word"
@@ -91,6 +96,9 @@ module Magenta
     end
 
     #  
+    # NOTE: The first instruction (with bytecode = 0) is considered a special 
+    # instruciton that exits interpreter. 
+    # 
     # i.e
     #
     # instruction "add", ["iA","iB"], ["iC"] do |i|
@@ -104,7 +112,13 @@ module Magenta
       i.bytecode = @next_instruction_bytecode
       @next_instruction_bytecode = @next_instruction_bytecode + 1
       i.stack_before = stack_before.collect { |se| parse_stack_entry(se) }
+      if i.stack_before.length > Instruction::MAX_STACK_ENTRY_COUNT
+        raise "The number of stack elements consumed is greater than the max for instruction #{name}" 
+      end
       i.stack_after = stack_after.collect { |se| parse_stack_entry(se) }
+      if i.stack_after.length > Instruction::MAX_STACK_ENTRY_COUNT
+        raise "The number of stack elements produced is greater than the max for instruction #{name}" 
+      end
       yield i
       @instructions << i
       i
