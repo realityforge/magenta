@@ -42,9 +42,7 @@ GEN
     DBG_STACK_EFFECT_SEPARATOR
 GEN
     instruction_set.stacks.each_value do |stack|
-      stack_diff = 
-        instruction.stack_before.collect {|stack_entry| stack_entry.stack == stack}.length - 
-        instruction.stack_after.collect {|stack_entry| stack_entry.stack == stack}.length
+      stack_diff = instruction.stack_diff(stack)
       writer.write "    sp_#{stack.name} += #{stack_diff}\n" unless stack_diff == 0
     end
 

@@ -23,6 +23,13 @@ class Instruction
   attr_accessor :code
   attr_accessor :stack_before
   attr_accessor :stack_after
+  
+  def stack_diff(stack)
+      before = self.stack_before.find_all {|stack_entry| stack_entry.stack == stack}.length 
+      after = self.stack_after.find_all {|stack_entry| stack_entry.stack == stack}.length
+      before - after
+  end
+  
 end
 
 class InstructionSet
