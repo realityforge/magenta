@@ -1,7 +1,6 @@
 #include "support.h"
 
 #define START_INSTRUCTION(name,bytecode) case bytecode: //#name bytecode:
-#define PREFETCH_NEXT_INSTRUCTION
 #define END_INSTRUCTION break;
 
 void disassembler( FILE *vm_out, instruction_stack_t *instruction_stack )
