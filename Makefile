@@ -1,6 +1,9 @@
 RUBY=ruby
 DEFINES=-DVM_DEBUG
 
+RUBY_DIR=src/main/ruby
+C_DIR=src/main/c
+
 main: target/magenta
 
 clean:
@@ -11,15 +14,18 @@ generated:
 
 target: 
 	mkdir -p target
-
-generated/execution-engine.c: src/main/ruby/example.rb generated
-	$(RUBY) src/main/ruby/example.rb
 	
-generated/stack-accessors.c: src/main/ruby/example.rb generated
-	$(RUBY) src/main/ruby/example.rb
+$(RUBY_DIR)/example.rb: $(RUBY_DIR)/magenta/magenta.rb $(RUBY_DIR)/magenta/model.rb $(RUBY_DIR)/magenta/generator/builder.rb $(RUBY_DIR)/magenta/generator/common.rb $(RUBY_DIR)/magenta/generator/execution_engine.rb
+	touch $(RUBY_DIR)/example.rb
 
-generated/declarations.h: src/main/ruby/example.rb generated
-	$(RUBY) src/main/ruby/example.rb
+generated/execution-engine.c: $(RUBY_DIR)/example.rb generated
+	$(RUBY) $(RUBY_DIR)/example.rb
 	
-target/magenta: target generated/declarations.h generated/stack-accessors.c generated/execution-engine.c src/main/c/driver.c src/main/c/engine.c src/main/c/support.h
-	gcc $(DEFINES) -o target/magenta src/main/c/engine.c src/main/c/driver.c -Wall -I generated/
+generated/stack-accessors.c: $(RUBY_DIR)/example.rb generated
+	$(RUBY) $(RUBY_DIR)/example.rb
+
+generated/declarations.h: $(RUBY_DIR)/example.rb generated
+	$(RUBY) $(RUBY_DIR)/example.rb
+	
+target/magenta: target generated/declarations.h generated/stack-accessors.c generated/execution-engine.c $(C_DIR)/driver.c  $(C_DIR)/engine.c  $(C_DIR)/support.h
+	gcc $(DEFINES) -o target/magenta src/main/c/engine.c src/main/c/driver.c -Wall -Werror -I generated
