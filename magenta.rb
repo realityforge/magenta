@@ -26,6 +26,7 @@ class Instruction
 end
 
 class InstructionSet
+  attr_reader :stacks
   attr_reader :instructions
   
   def self.define(&block)
@@ -89,10 +90,10 @@ private
     type_index = stack.nil? ? 0 : 1
     stack = @default_stack unless stack
     raise "Unable to determine stack for '#{description}' and no default stack specified" unless stack
-    type_prefix = description[type_index,type_index+1]
+    type_prefix = description[type_index,1]
     entry_type = @data_types[type_prefix]
     raise "Unknown type prefix for '#{description}'" unless entry_type
-    name = description[type_index,description.length - type_index]
+    name = description[type_index,1]
     se = StackEntry.new
     se.stack = stack
     se.entry_type = entry_type
@@ -110,13 +111,13 @@ class ExecutionEngineGenerator
   
   def generate(writer,instruction_set)
     instruction_set.instructions.each do |instruction|
-      generate_instruction(writer,instruction)
+      generate_instruction(writer,instruction_set,instruction)
     end
   end
   
   private
   
-  def generate_instruction(writer,instruction)
+  def generate_instruction(writer,instruction_set,instruction)
     writer.write <<-GEN
   LABEL(#{instruction.name})
   {
@@ -125,10 +126,11 @@ GEN
     instruction.stack_before.each_with_index do |stack_entry, index|
       # TODO: GET_STACK_ITEM_* has to deal with different stacks
       entry_type = stack_entry.entry_type
-      stack_type = stack_entry.stack.element_type.name
+      stack = stack_entry.stack
+      stack_type = stack.element_type.name
       converter = (entry_type.name == stack_type) ? "" : "vm_convert_#{stack_type}_to_#{entry_type.name}"
       writer.write <<-GEN
-    const #{entry_type.c_type} #{stack_entry.name} = #{converter}(GET_STACK_ITEM_#{index}());
+    const #{entry_type.c_type} #{stack_entry.name} = #{converter}(GET_#{stack.name}_STACK_ITEM_#{index}());
     DBG_ARG(#{stack_entry.name},#{entry_type.name})
 GEN
     end
@@ -139,11 +141,17 @@ GEN
 GEN
     end
 
-    # TODO: Fix when operands come from different stacks
     writer.write <<-GEN
     DBG_STACK_EFFECT_SEPARATOR
-    sp += #{instruction.stack_before.length - instruction.stack_after.length}
 GEN
+    instruction_set.stacks.each_value do |stack|
+      stack_diff = 
+        instruction.stack_before.collect {|stack_entry| stack_entry.stack == stack}.length - 
+        instruction.stack_after.collect {|stack_entry| stack_entry.stack == stack}.length
+      writer.write <<-GEN
+    sp_#{stack.name} += #{stack_diff}
+GEN
+    end
 
     # TODO: Should put in preprocessor directives to indicate the source
     # instruction location. i.e. 
@@ -157,10 +165,11 @@ GEN
 GEN
     instruction.stack_after.reverse.each_with_index do |stack_entry, index|
       entry_type = stack_entry.entry_type
-      stack_type = stack_entry.stack.element_type.name
+      stack = stack_entry.stack
+      stack_type = stack.element_type.name
       converter = (entry_type.name == stack_type) ? "" : "vm_convert_#{entry_type.name}_to_#{stack_type}"
       writer.write <<-GEN
-    PUT_STACK_ITEM_#{index}(#{converter}(#{stack_entry.name}))
+    PUT_#{stack.name}_STACK_ITEM_#{index}(#{converter}(#{stack_entry.name}))
     DBG_ARG(#{stack_entry.name},#{entry_type.name})
 GEN
     end
@@ -176,9 +185,20 @@ end
 my_instruction_set = InstructionSet.define do 
   
   data_type "integer", "i", "int"
+  data_type "word", "w", "int"
   
-  stack "instruction", "#", "integer"
+  stack "instruction", "#", "word"
   stack "data", "%", "integer", :default => true
+  
+  instruction "drop", ["iA"], [] do |i|
+    i.description = "Pop a literal from data stack and discard."
+    i.code = ""
+  end
+
+  instruction "literali", ["#iA"], ["iB"] do |i|
+    i.description = "Push an integer literal onto data stack."
+    i.code = "iB = iA"
+  end
   
   instruction "addi", ["iA","iB"], ["iC"] do |i|
     i.description = "Add two integers together."
@@ -198,6 +218,16 @@ my_instruction_set = InstructionSet.define do
   instruction "modi", ["iA","iB"], ["iC"] do |i|
     i.description = "Modulus one integer by another."
     i.code = "iC = iA % iB"
+  end
+  
+  instruction "negi", ["iA"], ["iB"] do |i|
+    i.description = "Negate an integer."
+    i.code = "iB = -iA"
+  end
+  
+  instruction "printi", ["iA"], [] do |i|
+    i.description = "Print an integer."
+    i.code = 'printf("%d\n",iA)'
   end
   
 end
