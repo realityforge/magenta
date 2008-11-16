@@ -29,7 +29,7 @@ GEN
 private  
       def generate_instruction_builder(writer,instruction_set,instruction)
         writer.write "IB_API void gen_#{instruction.name}(instruction_stack_t **instructions"
-        inline = instruction.stack_before.find_all {|se| se.stack.name == 'instruction'}
+        inline = instruction.stack_before.find_all {|se| se.stack.instruction_stack?}
         inline.each do |stack_entry|
           writer.write ", const #{stack_entry.entry_type.to_native_type} #{stack_entry.name}"
         end

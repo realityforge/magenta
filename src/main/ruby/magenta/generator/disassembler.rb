@@ -27,7 +27,7 @@ private
 GEN
         instruction.stack_before.each_with_index do |stack_entry, index|
           stack = stack_entry.stack
-          next unless stack.name == 'instruction'
+          next unless stack.instruction_stack?
           entry_type = stack_entry.entry_type
           stack_type = stack.element_type.name
           converter = (entry_type.name == stack_type) ? "" : "vm_convert_#{stack_type}_to_#{entry_type.name}"
@@ -39,7 +39,7 @@ GEN
         end
 
         instruction_set.stacks.each_value do |stack|
-          next unless stack.name == 'instruction'
+          next unless stack.instruction_stack?
           stack_diff = instruction.stack_diff(stack)
           writer.write "    sp_#{stack.name} += #{stack_diff};\n" unless stack_diff == 0
         end

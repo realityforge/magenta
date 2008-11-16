@@ -11,9 +11,15 @@ module Magenta
   end
 
   class Stack
+    INSTRUCTION_STACK_NAME = "instruction"
+    
     attr_accessor :name
     attr_accessor :prefix
     attr_accessor :element_type
+    
+    def instruction_stack?
+      self.name == INSTRUCTION_STACK_NAME
+    end
   end
 
   class StackEntry

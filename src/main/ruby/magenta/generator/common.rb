@@ -48,7 +48,7 @@ private
 #endif
 #define #{accessor}() (sp_#{stack.name}[#{index}])
 GEN
-          if stack.name != 'instruction'
+          unless stack.instruction_stack?
             writer.write <<-GEN
 #ifdef #{mutator}
 #  undef #{mutator}
