@@ -1,5 +1,5 @@
 RUBY=ruby
-DEFINES=-DVM_DEBUG
+DEFINES=-DVM_DEBUG -DVM_DISASSEMBLER
 
 RUBY_DIR=src/main/ruby
 C_DIR=src/main/c
@@ -27,5 +27,5 @@ generated/stack-accessors.c: $(RUBY_DIR)/example.rb generated
 generated/declarations.h: $(RUBY_DIR)/example.rb generated
 	$(RUBY) $(RUBY_DIR)/example.rb
 	
-target/magenta: target generated/declarations.h generated/stack-accessors.c generated/execution-engine.c $(C_DIR)/driver.c  $(C_DIR)/engine.c  $(C_DIR)/support.h
-	gcc $(DEFINES) -o target/magenta src/main/c/engine.c src/main/c/driver.c -Wall -Werror -I generated
+target/magenta: target generated/declarations.h generated/stack-accessors.c generated/execution-engine.c $(C_DIR)/driver.c  $(C_DIR)/engine.c  $(C_DIR)/support.h $(C_DIR)/disassembler.c 
+	gcc $(DEFINES) -o target/magenta $(C_DIR)/engine.c $(C_DIR)/driver.c $(C_DIR)/disassembler.c -Wall -Werror -I generated

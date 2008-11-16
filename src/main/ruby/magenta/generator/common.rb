@@ -4,10 +4,10 @@ module Magenta
     class Common
       def self.generate(base_filename,instruction_set)
         g = self.new
-        File.open("#{base_filename}declarations.h","w") do |f|
+        File.open("#{base_filename}declarations.inc","w") do |f|
           g.generate_declarations(f,instruction_set)
         end
-        File.open("#{base_filename}stack-accessors.c","w") do |f|
+        File.open("#{base_filename}stack-accessors.inc","w") do |f|
           g.generate_stack_accessors(f,instruction_set)
         end
       end
@@ -19,11 +19,11 @@ module Magenta
         instruction_set.stacks.each_value do |stack|
           generate_stack_declaration(writer,stack)
         end
-        writer.write "#ifdef VM_DEBUG\n"
+        writer.write "#if (VM_DEBUG || VM_DISASSEMBLER)\n"
         instruction_set.data_types.each_value do |stack|
           generate_data_type_debug(writer,stack)
         end
-        writer.write "#endif //VM_DEBUG\n"
+        writer.write "#endif //(VM_DEBUG || VM_DISASSEMBLER)\n"
       end
 
       def generate_stack_accessors(writer,instruction_set)
@@ -47,14 +47,17 @@ private
 #  undef #{accessor}
 #endif
 #define #{accessor}() (sp_#{stack.name}[#{index}])
-
+GEN
+          if stack.name != 'instruction'
+            writer.write <<-GEN
 #ifdef #{mutator}
 #  undef #{mutator}
 #endif
 #define #{mutator}(value) (sp_#{stack.name}[#{index}] = value)
-
-
 GEN
+          end
+          
+          writer.write "\n\n"
         end
       end
 

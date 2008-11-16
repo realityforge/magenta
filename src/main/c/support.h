@@ -1,3 +1,7 @@
+#include <stdlib.h>
+#include <stdio.h>
+
+#include "declarations.inc"
 
 #ifdef VM_DEBUG
 
@@ -28,3 +32,7 @@ extern FILE* vm_out;
 
 extern void panic(const char * format, ...);
 extern void engine( instruction_stack_t *instruction_stack, data_stack_t *data_stack );
+
+#ifdef VM_DISASSEMBLER
+extern void disassembler( FILE *vm_out, instruction_stack_t *instruction_stack );
+#endif

@@ -4,10 +4,10 @@ module Magenta
     class Builder
       def self.generate(base_filename,instruction_set)
         g = self.new
-        File.open("#{base_filename}instruction-builder.c","w") do |f|
+        File.open("#{base_filename}instruction-builder.inc","w") do |f|
           g.generate_builder(f,instruction_set)
         end
-        File.open("#{base_filename}instruction-table.c","w") do |f|
+        File.open("#{base_filename}instruction-table.inc","w") do |f|
           g.generate_instruction_table(f,instruction_set)
         end
       end

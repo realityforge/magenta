@@ -1,8 +1,5 @@
-#include <stdlib.h>
 #include <stdarg.h>
-#include <stdio.h>
 
-#include "declarations.h"
 #include "support.h"
 
 #ifdef VM_DEBUG
@@ -10,12 +7,17 @@
 int vm_debug;
 FILE* vm_out;
 
+#endif
+
+#if (VM_DEBUG || VM_DISASSEMBLER)
+
 void printarg_integer(FILE *vm_out, const integer_data_type_t value )
 {
 	fprintf(vm_out, "%d", value );
 }
 
 #endif
+
 
 void panic(const char * format, ...) 
 {
@@ -27,7 +29,7 @@ void panic(const char * format, ...)
 }
 
 #define INSTRUCTION(name,bytecode)
-#include "instruction-table.c"
+#include "instruction-table.inc"
 #undef INSTRUCTION
 
 static inline void instruction_append(instruction_stack_t **instructions, const integer_data_type_t value)
@@ -41,7 +43,7 @@ static inline void instruction_append(instruction_stack_t **instructions, const 
 
 #define IB_API static inline
 #define INSTRUCTION_CODE(bytecode) bytecode
-#include "instruction-builder.c"
+#include "instruction-builder.inc"
 
 #define CODE_SIZE 65536
 #define STACK_SIZE 65536
@@ -65,6 +67,10 @@ vm_out = stderr;
 	gen_addi(&instructions);
 	gen_printi(&instructions);
 	gen_exit(&instructions);
+
+#ifdef VM_DISASSEMBLER
+	disassembler( stderr, instruction_stack );
+#endif
 
   engine(instruction_stack, data_stack + STACK_SIZE - 1);
   return 0;
