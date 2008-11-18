@@ -9,7 +9,9 @@ GCC=gcc
 DEBUG=0
 ASSEMBLER=0
 
-DEFINES=
+# -pedantic -pedantic-errors -Wextra 
+STRICTNESS_DEFINES=-Wall -Wextra
+DEFINES=-std=c99 -Wfatal-errors
 
 ifeq ($(ASSEMBLER),1)
 DEFINES+=-DMG_DISASSEMBLER
@@ -18,7 +20,8 @@ endif
 ifeq ($(DEBUG),1)
 DEFINES+=-DMG_DEBUG -g
 else
-DEFINES+=-O3
+#DEFINES+= -no-integrated-cpp -O3 -fomit-frame-pointer -fstrict-aliasing -momit-leaf-frame-pointer -fno-tree-pre -falign-loops
+DEFINES+= -fast -fno-fast-math
 endif
 
 INCLUDES=-I generated -I $(C_DIR) 
@@ -59,4 +62,4 @@ target/magenta: target generated/declarations.h generated/stack-accessors.c gene
 ifeq ($(ASSEMBLER),1)
 	$(COMPILE) -o target/disassembler.o $(C_DIR)/disassembler.c -c
 endif
-	$(COMPILE) -o target/magenta  $(C_DIR)/engine.c $(C_DIR)/driver.c -Wall target/*.o
+	$(COMPILE) -o target/magenta  $(C_DIR)/engine.c $(C_DIR)/driver.c $(STRICTNESS_DEFINES) target/*.o

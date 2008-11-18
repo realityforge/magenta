@@ -9,7 +9,7 @@ FILE* vm_out;
 
 #endif
 
-#if (MG_DEBUG || VM_DISASSEMBLER)
+#if (MG_DEBUG || MG_DISASSEMBLER)
 
 void printarg_integer(FILE *vm_out, const integer_data_type_t value )
 {
@@ -31,7 +31,6 @@ void panic(const char * format, ...)
 void * mg_instruction_table[256];
 
 char *program_name;
-FILE *yyin;
 
 #define CODE_SIZE 65536
 #define STACK_SIZE 65536
@@ -65,7 +64,7 @@ vm_out = stderr;
 
   *(vmcodep++) = INSTRUCTION_CODE(0);
 
-#ifdef VM_DISASSEMBLER
+#ifdef MG_DISASSEMBLER
 	disassembler( stderr, instruction_stack );
 #endif
 

@@ -41,7 +41,7 @@ extern void panic(const char * format, ...);
 //extern void engine( instruction_stack_t *instruction_stack, data_stack_t *data_stack );
 extern void engine( instruction_stack_t *instruction_stack, data_stack_t *data_stack, void **instruction_table );
 
-#ifdef VM_DISASSEMBLER
+#ifdef MG_DISASSEMBLER
 extern void disassembler( FILE *vm_out, instruction_stack_t *instruction_stack );
 #endif
 
