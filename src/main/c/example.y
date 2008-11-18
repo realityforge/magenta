@@ -54,4 +54,8 @@ int yywrap(void)
   return 1;
 }
 
+#pragma GCC diagnostic ignored "-Wunused-label"
+#pragma GCC diagnostic ignored "-Wunused-function"
+#pragma gcc diagnostic ignored "format"
+
 #include "scanner.inc"

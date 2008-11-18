@@ -2,14 +2,14 @@
 
 #include "support.h"
 
-#ifdef VM_DEBUG
+#ifdef MG_DEBUG
 
 int vm_debug;
 FILE* vm_out;
 
 #endif
 
-#if (VM_DEBUG || VM_DISASSEMBLER)
+#if (MG_DEBUG || VM_DISASSEMBLER)
 
 void printarg_integer(FILE *vm_out, const integer_data_type_t value )
 {
@@ -28,7 +28,7 @@ void panic(const char * format, ...)
   exit(1);
 }
 
-//#include "assembler.c"
+void * mg_instruction_table[256];
 
 char *program_name;
 FILE *yyin;
@@ -48,11 +48,13 @@ int main(int argc, char **argv)
     exit(1);
   }
 	
+  engine(NULL, NULL, mg_instruction_table);
+
   instruction_stack_t *instruction_stack = 
     (instruction_stack_t *)calloc( CODE_SIZE, sizeof(instruction_stack_t) );
   data_stack_t *data_stack = (data_stack_t *)calloc( STACK_SIZE, sizeof(data_stack_t) );
 
-#ifdef VM_DEBUG
+#ifdef MG_DEBUG
  vm_debug = 1;
 vm_out = stderr;
 #endif
@@ -61,24 +63,12 @@ vm_out = stderr;
   
   if ( yyparse() ) exit(1);
 
-  *(vmcodep + 1) = 0;
-
-#if 0
-  instruction_stack[0] = 0;
-    instruction_stack_t *instructions = instruction_stack;
-  
-    gen_literali(&instructions,1);
-	gen_literali(&instructions,3);
-	gen_addi(&instructions);
-	gen_printi(&instructions);
-	gen_exit(&instructions);
-
-#endif
+  *(vmcodep++) = INSTRUCTION_CODE(0);
 
 #ifdef VM_DISASSEMBLER
 	disassembler( stderr, instruction_stack );
 #endif
 
-  engine(instruction_stack, data_stack + STACK_SIZE - 1);
+  engine(instruction_stack, data_stack + STACK_SIZE - 1, mg_instruction_table);
   return 0;
 }

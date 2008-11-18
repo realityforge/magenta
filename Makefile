@@ -1,11 +1,29 @@
+RUBY_DIR=src/main/ruby
+C_DIR=src/main/c
+
 RUBY=ruby
 LEX=flex -l
 YACC=bison -y
+GCC=gcc
 
-DEFINES=-DVM_DEBUG -DVM_DISASSEMBLER
+DEBUG=0
+ASSEMBLER=0
 
-RUBY_DIR=src/main/ruby
-C_DIR=src/main/c
+DEFINES=
+
+ifeq ($(ASSEMBLER),1)
+DEFINES+=-DMG_DISASSEMBLER
+endif
+
+ifeq ($(DEBUG),1)
+DEFINES+=-DMG_DEBUG -g
+else
+DEFINES+=-O3
+endif
+
+INCLUDES=-I generated -I $(C_DIR) 
+
+COMPILE=$(GCC) $(INCLUDES) $(DEFINES)
 
 main: target/magenta
 
@@ -37,4 +55,8 @@ generated/parser.c: $(C_DIR)/example.y
 	$(YACC) -o generated/parser.c $(C_DIR)/example.y
 
 target/magenta: target generated/declarations.h generated/stack-accessors.c generated/execution-engine.c $(C_DIR)/driver.c  $(C_DIR)/engine.c  $(C_DIR)/support.h $(C_DIR)/disassembler.c generated/scanner.inc generated/parser.c
-	gcc $(DEFINES) -o target/magenta generated/parser.c $(C_DIR)/engine.c $(C_DIR)/driver.c $(C_DIR)/disassembler.c -Wall -I generated -I $(C_DIR)
+	$(COMPILE) -o target/parser.o generated/parser.c -c
+ifeq ($(ASSEMBLER),1)
+	$(COMPILE) -o target/disassembler.o $(C_DIR)/disassembler.c -c
+endif
+	$(COMPILE) -o target/magenta  $(C_DIR)/engine.c $(C_DIR)/driver.c -Wall target/*.o

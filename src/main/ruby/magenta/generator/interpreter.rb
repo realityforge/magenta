@@ -54,7 +54,7 @@ GEN
     DBG_STACK_EFFECT_SEPARATOR;
 GEN
         instruction_set.stacks.each_value do |stack|
-          stack_diff = instruction.stack_diff(stack)
+          stack_diff = instruction.stack_diff(stack) + (stack.instruction_stack? ? 1 : 0)
           writer.write "    sp_#{stack.name} += #{stack_diff};\n" unless stack_diff == 0
         end
 
@@ -64,10 +64,10 @@ GEN
         #   ...code... 
         #   #line 423 "MyGeneratedEngine.c"
         writer.write <<-GEN
+    PREFETCH_NEXT_INSTRUCTION;
     {
       #{instruction.code};
     }
-    PREFETCH_NEXT_INSTRUCTION;
 GEN
         instruction.stack_after.reverse.each_with_index do |stack_entry, index|
           entry_type = stack_entry.entry_type

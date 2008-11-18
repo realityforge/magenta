@@ -11,7 +11,7 @@ my_instruction_set = Magenta::InstructionSet.define do
   
   instruction "exit", [], [] do |i|
     i.description = "Exit the interpreter."
-    i.code = 'exit(0);'
+    i.code = 'return'
   end
 
   instruction "drop", ["iA"], [] do |i|

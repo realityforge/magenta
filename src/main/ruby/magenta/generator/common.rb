@@ -32,11 +32,11 @@ module Magenta
         end
         
         # generate printing prototypes for debugging/disassembling
-        writer.write "#if (VM_DEBUG || VM_DISASSEMBLER)\n"
+        writer.write "#if (MG_DEBUG || VM_DISASSEMBLER)\n"
         instruction_set.data_types.each_value do |stack|
           generate_data_type_debug(writer,stack)
         end
-        writer.write "#endif //(VM_DEBUG || VM_DISASSEMBLER)\n"
+        writer.write "#endif //(MG_DEBUG || VM_DISASSEMBLER)\n"
       end
 
       def generate_stack_accessors(writer,instruction_set)
@@ -59,14 +59,14 @@ private
 #ifdef #{accessor}
 #  undef #{accessor}
 #endif
-#define #{accessor}() (sp_#{stack.name}[#{index}])
+#define #{accessor}() (sp_#{stack.name}[#{index} + 1])
 GEN
           unless stack.instruction_stack?
             writer.write <<-GEN
 #ifdef #{mutator}
 #  undef #{mutator}
 #endif
-#define #{mutator}(value) (sp_#{stack.name}[#{index}] = value)
+#define #{mutator}(value) (sp_#{stack.name}[#{index} + 1] = value)
 GEN
           end
           

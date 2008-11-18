@@ -40,17 +40,23 @@ module Magenta
   class Instruction
     MAX_STACK_ENTRY_COUNT = 5
     
+    # bytecodes start at 1. 0 is reserved for end of interpretation
     attr_accessor :bytecode
     attr_accessor :name
     attr_accessor :description
     attr_accessor :code
     attr_accessor :stack_before
     attr_accessor :stack_after
+    attr_accessor :options
   
     def stack_diff(stack)
         before = self.stack_before.find_all {|stack_entry| stack_entry.stack == stack}.length 
         after = self.stack_after.find_all {|stack_entry| stack_entry.stack == stack}.length
         before - after
+    end
+    
+    def terminator?
+      options[:terminator] == true
     end
   
   end
@@ -67,7 +73,7 @@ module Magenta
     end
   
     def initialize
-      @next_instruction_bytecode = 0
+      @next_instruction_bytecode = 1
       @instructions = []
       @data_types = {}
       @stacks = {}
@@ -122,9 +128,10 @@ module Magenta
     #   i.code = "iC = iA + iB"
     # end
     #
-    def instruction(name,stack_before,stack_after)
+    def instruction(name,stack_before,stack_after, options = {})
       i =  Instruction.new
       i.name = name
+      i.options = options
       i.bytecode = @next_instruction_bytecode
       @next_instruction_bytecode = @next_instruction_bytecode + 1
       i.stack_before = stack_before.collect { |se| parse_stack_entry(se) }

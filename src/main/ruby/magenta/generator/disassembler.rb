@@ -22,7 +22,6 @@ private
     #{instruction.description}
   */
   START_INSTRUCTION(#{instruction.name},#{instruction.bytecode})
-  {
     PRINT_INSTRUCTION(#{instruction.name});
 GEN
         instruction.stack_before.each_with_index do |stack_entry, index|
@@ -39,14 +38,13 @@ GEN
 
         instruction_set.stacks.each_value do |stack|
           next unless stack.instruction_stack?
-          stack_diff = instruction.stack_diff(stack)
+          stack_diff = instruction.stack_diff(stack) + 1
           writer.write "    sp_#{stack.name} += #{stack_diff};\n" unless stack_diff == 0
         end
 
         writer.write <<-GEN
     PRINT_INSTRUCTION_END;
-    END_INSTRUCTION;
-  }
+  END_INSTRUCTION
 
 
 GEN
