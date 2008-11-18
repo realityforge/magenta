@@ -39,27 +39,18 @@ generated:
 target: 
 	mkdir -p target
 	
-$(RUBY_DIR)/example.rb: $(RUBY_DIR)/magenta/magenta.rb $(RUBY_DIR)/magenta/model.rb $(RUBY_DIR)/magenta/generator/assembler.rb $(RUBY_DIR)/magenta/generator/common.rb $(RUBY_DIR)/magenta/generator/interpreter.rb $(RUBY_DIR)/magenta/generator/disassembler.rb
-	touch $(RUBY_DIR)/example.rb
-
-generated/execution-engine.c: $(RUBY_DIR)/example.rb generated
+generated/interpreter.inc: $(RUBY_DIR)/*.rb $(RUBY_DIR)/magenta/*.rb  $(RUBY_DIR)/magenta/generator/*.rb generated
 	$(RUBY) $(RUBY_DIR)/example.rb
 	
-generated/stack-accessors.c: $(RUBY_DIR)/example.rb generated
-	$(RUBY) $(RUBY_DIR)/example.rb
-
-generated/declarations.h: $(RUBY_DIR)/example.rb generated
-	$(RUBY) $(RUBY_DIR)/example.rb
-
 generated/scanner.inc: $(C_DIR)/example.l generated
 	$(LEX) -o generated/scanner.inc $(C_DIR)/example.l 
 
 generated/parser.c: $(C_DIR)/example.y
 	$(YACC) -o generated/parser.c $(C_DIR)/example.y
 
-target/magenta: target generated/declarations.h generated/stack-accessors.c generated/execution-engine.c $(C_DIR)/driver.c  $(C_DIR)/engine.c  $(C_DIR)/support.h $(C_DIR)/disassembler.c generated/scanner.inc generated/parser.c
+target/magenta: target generated/interpreter.inc $(C_DIR)/driver.c  $(C_DIR)/interpreter.c  $(C_DIR)/support.h $(C_DIR)/disassembler.c generated/scanner.inc generated/parser.c
 	$(COMPILE) -o target/parser.o generated/parser.c -c
 ifeq ($(ASSEMBLER),1)
 	$(COMPILE) -o target/disassembler.o $(C_DIR)/disassembler.c -c
 endif
-	$(COMPILE) -o target/magenta  $(C_DIR)/engine.c $(C_DIR)/driver.c $(STRICTNESS_DEFINES) target/*.o
+	$(COMPILE) -o target/magenta  $(C_DIR)/interpreter.c $(C_DIR)/driver.c $(STRICTNESS_DEFINES) target/*.o

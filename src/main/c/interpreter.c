@@ -16,7 +16,7 @@
 #  error "Unknown value of MG_DISPATCH_SCHEME"
 #endif
 
-void engine( instruction_stack_t *instruction_stack, data_stack_t *data_stack, void **instruction_table )
+static void engine( instruction_stack_t *instruction_stack, data_stack_t *data_stack, void **instruction_table )
 {
 	//instruction_stack is NULL when initializing the engine for non switched dispatch
 	if (NULL == instruction_stack) goto INSTRUCTION_TABLE_SETUP; 
@@ -42,5 +42,15 @@ instruction_table[0] = &&EndInterpretation;
 #  include "instruction-table.inc"
 #endif
 	return;
+}
+
+void interpreter_execute(instruction_stack_t *instruction_stack, data_stack_t *data_stack)
+{
+	engine(instruction_stack,data_stack,NULL);
+}
+
+void interpreter_init(void **instruction_table)
+{
+	engine(NULL,NULL,instruction_table);
 }
 

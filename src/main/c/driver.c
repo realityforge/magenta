@@ -47,7 +47,7 @@ int main(int argc, char **argv)
     exit(1);
   }
 	
-  engine(NULL, NULL, mg_instruction_table);
+  interpreter_init(mg_instruction_table);
 
   instruction_stack_t *instruction_stack = 
     (instruction_stack_t *)calloc( CODE_SIZE, sizeof(instruction_stack_t) );
@@ -68,6 +68,6 @@ vm_out = stderr;
 	disassembler( stderr, instruction_stack );
 #endif
 
-  engine(instruction_stack, data_stack + STACK_SIZE - 1, mg_instruction_table);
+  interpreter_execute(instruction_stack, data_stack + STACK_SIZE - 1);
   return 0;
 }
