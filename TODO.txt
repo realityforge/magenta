@@ -1,0 +1,6 @@
+* Add a generator for the bytecode => direct code translator
+* add indirect dispatch approach
+* add some different prefetch strategies
+* add some stack element caching
+* fix types of stack vs types of elements blarg
+* add super instructions
