@@ -1,13 +1,14 @@
 module Magenta
 
   class DataType
-    attr_accessor :name
-    attr_accessor :prefix
-    attr_accessor :c_type
-    attr_accessor :converters
+    attr_reader :name
+    attr_reader :prefix
+    attr_reader :c_type
+    attr_reader :converters
     
-    def initialize
-      @converters = {}
+    def initialize(name,prefix,c_type)
+      @name, @prefix, @c_type, @converters = name, prefix, c_type, {}
+      self.freeze
     end
     
     def converter(name,code)
@@ -108,10 +109,7 @@ module Magenta
     # data_type "integer", "i", "int"
     #
     def data_type(name, prefix, c_type, &block)
-      dt = DataType.new
-      dt.name = name
-      dt.prefix = prefix
-      dt.c_type = c_type
+      dt = DataType.new(name, prefix, c_type)
       @data_types[prefix] = dt
       yield dt if block
       dt
