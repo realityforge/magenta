@@ -4,3 +4,10 @@
 * add some stack element caching
 * fix types of stack vs types of elements blarg
 * add super instructions
+* add use of LIKELY/UNLIKELY macros
+* make use of PREFETCH macro
+
+
+OSX tools:
+* nm (which spits out symbol names) 
+* otool (which disassembles and gives other information about a binary). i.e. otool -Vt 
