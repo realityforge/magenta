@@ -26,11 +26,26 @@ extern FILE* vm_out;
 
 #endif
 
-#if defined(__GNUC__) && ((__GNUC__==2 && defined(__GNUC_MINOR__) && __GNUC_MINOR__>=7)||(__GNUC__>2))
-#define MAYBE_UNUSED __attribute__((unused))
+#ifdef __GNUC__
+#  define MAYBE_UNUSED __attribute__((unused))
+#  define LIKELY(x) __builtin_expect(!!(x), 1)
+#  define UNLIKELY(x) __builtin_expect(!!(x), 0)
+#  ifndef ARCH_HAS_PREFETCH
+// rw => prefetch for read or write?, locality => left in cache or purged?
+// void __builtin_prefetch( const void *addr, int rw, int locality );
+#    define PREFETCH(x) __builtin_prefetch(x)
+#  endif
+
 #else
-#define MAYBE_UNUSED
+#  define MAYBE_UNUSED
+#  define LIKELY(x)
+#  define UNLIKELY(x)
 #endif
+
+#ifndef PREFETCH
+#  define PREFETCH(x)
+#endif
+
 
 extern char *program_name;
 extern FILE *yyin;
