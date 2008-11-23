@@ -4,14 +4,14 @@ C_DIR=src/main/c
 RUBY=ruby
 LEX=flex -l
 YACC=bison -y
-GCC=gcc
+CC=gcc
 
 DEBUG=0
 ASSEMBLER=0
 
-# -pedantic -pedantic-errors -Wextra 
-STRICTNESS_DEFINES=-Wall -Wextra
-DEFINES=-std=c99 -Wfatal-errors
+STRICTNESS_CFLAGS=-Wall -Wextra
+CFLAGS=-std=c99 -Wfatal-errors
+DEFINES=
 
 ifeq ($(ASSEMBLER),1)
 DEFINES+=-DMG_DISASSEMBLER
@@ -20,16 +20,21 @@ endif
 ifeq ($(DEBUG),1)
 DEFINES+=-DMG_DEBUG -g
 else
-#DEFINES+= -no-integrated-cpp -O3 -fomit-frame-pointer -fstrict-aliasing -momit-leaf-frame-pointer -fno-tree-pre -falign-loops
-DEFINES+= -fast -fno-fast-math
+CFLAGS+= -fast -fno-fast-math
 endif
 
 INCLUDES=-I generated -I $(C_DIR) 
 
-COMPILE=$(GCC) $(INCLUDES) $(DEFINES)
+GENERATED_SRC=generated/interpreter.inc generated/scanner.inc generated/parser.c
 
-main: target/magenta
+SRCS = $(C_DIR)/interpreter.c $(C_DIR)/driver.c $(C_DIR)/disassembler.c
 
+COMPILE=$(CC) $(INCLUDES) $(DEFINES) $(CFLAGS)
+
+.PHONY: all
+all: target/magenta
+
+.PHONY: clean
 clean:
 	rm -rf target generated
 
@@ -45,12 +50,18 @@ generated/interpreter.inc: $(RUBY_DIR)/*.rb $(RUBY_DIR)/magenta/*.rb  $(RUBY_DIR
 generated/scanner.inc: $(C_DIR)/example.l generated
 	$(LEX) -o generated/scanner.inc $(C_DIR)/example.l 
 
-generated/parser.c: $(C_DIR)/example.y
+generated/parser.c: $(C_DIR)/example.y generated/scanner.inc
 	$(YACC) -o generated/parser.c $(C_DIR)/example.y
 
-target/magenta: target generated/interpreter.inc $(C_DIR)/driver.c  $(C_DIR)/interpreter.c  $(C_DIR)/support.h $(C_DIR)/disassembler.c generated/scanner.inc generated/parser.c
+%.d : %.c $(GENERATED_SRC)
+	@dirname $* | xargs echo generated/deps | tr ' ' '/' | xargs mkdir -p
+	@makedepend  $(INCLUDES) $(DEFINES) -f - $< | sed 's, \($*\.o\)[ :]*\(.*\), $@ : $$\(wildcard \2\)\n\1 : \2,g' > generated/deps/$*.d
+
+-include $(SRCS:.c=generated/deps/$*.d)
+
+target/magenta: target generated/interpreter.inc generated/scanner.inc generated/parser.c $(SRCS:.c=.d)
 	$(COMPILE) -o target/parser.o generated/parser.c -c
 ifeq ($(ASSEMBLER),1)
 	$(COMPILE) -o target/disassembler.o $(C_DIR)/disassembler.c -c
 endif
-	$(COMPILE) -o target/magenta  $(C_DIR)/interpreter.c $(C_DIR)/driver.c $(STRICTNESS_DEFINES) target/*.o
+	$(COMPILE) -o target/magenta  $(C_DIR)/interpreter.c $(C_DIR)/driver.c $(STRICTNESS_CFLAGS) target/*.o
