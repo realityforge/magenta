@@ -28,20 +28,23 @@ GEN
 
 private  
       def generate_instruction_builder(writer,instruction_set,instruction)
-        writer.write "IB_API void gen_#{instruction.name}(instruction_stack_t **instructions"
+        writer.write "IB_API void mgGen_#{instruction.name}(instruction_stack_t **instructions, int *remaining"
         inline = instruction.stack_before.find_all {|se| se.stack.instruction_stack?}
+        instruction_size = 1 
         inline.each do |stack_entry|
           writer.write ", const #{stack_entry.entry_type.to_native_type} #{stack_entry.name}"
+          instruction_size = instruction_size + 1
         end
 
         writer.write <<-GEN
 )        
 {
-  instruction_append(instructions,INSTRUCTION_CODE(#{instruction.bytecode}));
+  if( *remaining < #{instruction_size} ) { panic("Instruction #{instruction.name} requires more bytes in code buffer than are remaining"); }
+  mgInstructionAppend(instructions,INSTRUCTION_CODE(#{instruction.bytecode}));
 GEN
 
 inline.each do |stack_entry|
-  writer.write "  instruction_append(instructions,#{stack_entry.name});\n"
+  writer.write "  mgInstructionAppend(instructions,#{stack_entry.name});\n"
 end
 
         writer.write <<-GEN

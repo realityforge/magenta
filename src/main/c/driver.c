@@ -47,7 +47,7 @@ int main(int argc, char **argv)
     exit(1);
   }
 	
-  interpreter_init(mg_instruction_table);
+  mgInterpreterInit(mg_instruction_table);
 
   instruction_stack_t *instruction_stack = 
     (instruction_stack_t *)calloc( CODE_SIZE, sizeof(instruction_stack_t) );
@@ -59,15 +59,16 @@ vm_out = stderr;
 #endif
 
   vmcodep = instruction_stack;
+  vmCodeRemaining = CODE_SIZE;
   
   if ( yyparse() ) exit(1);
 
   *(vmcodep++) = INSTRUCTION_CODE(0);
 
 #ifdef MG_DISASSEMBLER
-	disassembler( stderr, instruction_stack );
+	mgDisassembler( stderr, instruction_stack );
 #endif
 
-  interpreter_execute(instruction_stack, data_stack + STACK_SIZE - 1);
+  mgInterpreterExecute(instruction_stack, data_stack + STACK_SIZE - 1);
   return 0;
 }

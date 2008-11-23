@@ -12,14 +12,18 @@
 #  define START_INSTRUCTION(name,bytecode) instruction_##name: //#name bytecode
 #  define PREFETCH_NEXT_INSTRUCTION
 #  define END_INSTRUCTION {goto *(*sp_instruction);}
+#  define NEED_INSTRUCTION_TABLE 1
 #else
 #  error "Unknown value of MG_DISPATCH_SCHEME"
 #endif
 
-static void engine( instruction_stack_t *instruction_stack, data_stack_t *data_stack, void **instruction_table )
+static void mgEngine(instruction_stack_t *instruction_stack, data_stack_t *data_stack, void **instruction_table )
 {
 	//instruction_stack is NULL when initializing the engine for non switched dispatch
+#ifdef NEED_INSTRUCTION_TABLE
 	if (NULL == instruction_stack) goto INSTRUCTION_TABLE_SETUP; 
+#endif //NEED_INSTRUCTION_TABLE
+
 	int *sp_instruction = instruction_stack;
 	int *sp_data = data_stack;
 	
@@ -32,6 +36,8 @@ static void engine( instruction_stack_t *instruction_stack, data_stack_t *data_s
 	# include "stack-accessors.inc"
 	# include "interpreter.inc"
 	INTERPRETER_END;
+
+#ifdef NEED_INSTRUCTION_TABLE
 EndInterpretation:
 	return;
 	
@@ -42,15 +48,19 @@ instruction_table[0] = &&EndInterpretation;
 #  include "instruction-table.inc"
 #endif
 	return;
+
+#endif //NEED_INSTRUCTION_TABLE
 }
 
-void interpreter_execute(instruction_stack_t *instruction_stack, data_stack_t *data_stack)
+void mgInterpreterExecute(instruction_stack_t *instruction_stack, data_stack_t *data_stack)
 {
-	engine(instruction_stack,data_stack,NULL);
+	mgEngine(instruction_stack,data_stack,NULL);
 }
 
-void interpreter_init(void **instruction_table)
+void mgInterpreterInit(void **instruction_table)
 {
-	engine(NULL,NULL,instruction_table);
+#ifdef NEED_INSTRUCTION_TABLE
+	mgEngine(NULL,NULL,instruction_table);
+#endif //NEED_INSTRUCTION_TABLE
 }
 

@@ -2,6 +2,7 @@
 #include "support.h"
 
 instruction_stack_t *vmcodep;
+int vmCodeRemaining;
 int yylineno;
 
 void yyerror(const char *s)
@@ -15,13 +16,15 @@ int yylex();
 %}
 
 
-%token PRINT NUMBER
+%token PRINT NUMBER IDENTIFIER DEF END
 
 %union {
   long number;
+  char *string;
 }
 
 %type <number> NUMBER;
+%type <string> IDENTIFIER;
 
 %%
 program: statement_list
@@ -31,21 +34,42 @@ statement_list: statement
 		| statement ';' statement_list
        ;
 
-statement: PRINT expr { gen_printi(&vmcodep); }
-    | expr { gen_drop(&vmcodep); }
+statement: print_statement
+    | expr_statement
     ;
 
-expr: term '+' expr	 { gen_addi(&vmcodep); }
-    | term '-' expr	 { gen_subi(&vmcodep); }
-    | term '*' expr	 { gen_muli(&vmcodep); }
-    | term '%' expr	 { gen_modi(&vmcodep); }
-    | term '/' expr	 { gen_divi(&vmcodep); }
-    | '-' term		 { gen_negi(&vmcodep); }
+print_statement: PRINT expr { mgGen_printi(&vmcodep, &vmCodeRemaining); }
+	;
+
+expr_statement: expr { mgGen_drop(&vmcodep, &vmCodeRemaining); }
+	;
+
+/*
+assign_statement: IDENTIFIER '=' expr { mgGen_storelocali(&vmcodep, &vmCodeRemaining, var_offset($1)); }
+	;
+
+parameter: IDENTIFIER { insert_parameter($1); }
+	;
+	
+parameters: parameter ',' parameters 
+      | parameter
+      | ;
+
+function_statement: DEF IDENTIFIER '(' parameters ')' statement_list END { XXXX }
+	;
+*/	
+
+expr: term '+' expr	 { mgGen_addi(&vmcodep, &vmCodeRemaining); }
+    | term '-' expr	 { mgGen_subi(&vmcodep, &vmCodeRemaining); }
+    | term '*' expr	 { mgGen_muli(&vmcodep, &vmCodeRemaining); }
+    | term '%' expr	 { mgGen_modi(&vmcodep, &vmCodeRemaining); }
+    | term '/' expr	 { mgGen_divi(&vmcodep, &vmCodeRemaining); }
+    | '-' term		 { mgGen_negi(&vmcodep, &vmCodeRemaining); }
     | term
     ;
 
 term: '(' expr ')'
-    | NUMBER { gen_literali(&vmcodep, $1); }
+    | NUMBER { mgGen_literali(&vmcodep, &vmCodeRemaining, $1); }
     ;
 
 %%

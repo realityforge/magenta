@@ -22,7 +22,7 @@
 #define PRINT_IMMEDIATE(name,type) {fputs( #name "=", vm_out); printarg_##type(vm_out,name); fputc(' ', vm_out);}
 #define PRINT_INSTRUCTION_END {fputc('\n', vm_out);}
 
-void disassembler( FILE *vm_out, instruction_stack_t *instruction_stack )
+void mgDisassembler( FILE *vm_out, instruction_stack_t *instruction_stack )
 {
 	int *sp_instruction = instruction_stack;
 	

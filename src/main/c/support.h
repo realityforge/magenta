@@ -50,14 +50,15 @@ extern FILE* vm_out;
 extern char *program_name;
 extern FILE *yyin;
 extern instruction_stack_t *vmcodep;
+extern int vmCodeRemaining;
 extern int yyparse();
 
 extern void panic(const char * format, ...);
 
-extern void interpreter_execute(instruction_stack_t *instruction_stack, data_stack_t *data_stack);
-extern void interpreter_init(void **instruction_table);
+extern void mgInterpreterExecute(instruction_stack_t *instruction_stack, data_stack_t *data_stack);
+extern void mgInterpreterInit(void **instruction_table);
 #ifdef MG_DISASSEMBLER
-extern void disassembler( FILE *vm_out, instruction_stack_t *instruction_stack );
+extern void mgDisassembler( FILE *vm_out, instruction_stack_t *instruction_stack );
 #endif
 
 #if MG_DISPATCH_SCHEME == MG_SWITCH_DISPATCH

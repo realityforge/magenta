@@ -11,7 +11,7 @@ extern void *mg_instruction_table[];
 #  define IB_API static inline
 #endif //MG_NO_INLINE_GENERATOR
 
-IB_API void instruction_append(instruction_stack_t **instructions, const integer_data_type_t value)
+IB_API void mgInstructionAppend(instruction_stack_t **instructions, const integer_data_type_t value)
 {
 	**instructions = value;
 #ifdef MG_DEBUG > 1
