@@ -61,7 +61,4 @@ my_instruction_set = Magenta::InstructionSet.define do
   
 end
 
-Magenta::Generator::Common.generate("generated/",my_instruction_set)
-Magenta::Generator::Interpreter.generate("generated/",my_instruction_set)
-Magenta::Generator::Assembler.generate("generated/",my_instruction_set)
-Magenta::Generator::Disassembler.generate("generated/",my_instruction_set)
+Magenta::Generator::Driver.generate("generated/",my_instruction_set)
