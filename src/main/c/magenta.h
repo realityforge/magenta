@@ -10,6 +10,9 @@
  */
 #define MG_SWITCH_DISPATCH 1
 #define MG_DIRECT_DISPATCH 2
+#define MG_INDIRECT_DISPATCH 3
+#define MG_TOKEN_DISPATCH 4
+#define MG_REPLICATED_SWITCH_DISPATCH 5
 
 /*
  * Default to using a suitable dispatch scheme for platform.
@@ -32,7 +35,7 @@
 /*
  * Make sure a valid dispatch scheme was specified
  */
-#if !(MG_DISPATCH_SCHEME == MG_SWITCH_DISPATCH) && !(MG_DISPATCH_SCHEME == MG_DIRECT_DISPATCH)
+#if (MG_DISPATCH_SCHEME < MG_SWITCH_DISPATCH) || (MG_DISPATCH_SCHEME > MG_REPLICATED_SWITCH_DISPATCH)
 #  error Unknown value of MG_DISPATCH_SCHEME
 #endif
 
