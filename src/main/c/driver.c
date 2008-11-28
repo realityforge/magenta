@@ -39,7 +39,7 @@ int main(int argc, char **argv)
 {
   if( 2 != argc )
   {
-    panic("Expected filename parameter to command missing.");
+    panic("Expected filename parameter to command missing.\n");
   }
   program_name = argv[1];
   yyin = fopen( program_name,"r" );
