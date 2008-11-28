@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include "magenta.h"
+#include "magenta/types.h"
 
 #include "declarations.inc"
 
