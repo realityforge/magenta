@@ -37,25 +37,27 @@ char *program_name;
 
 int main(int argc, char **argv)
 {
-	if( argc != 2 )
-	{
-		panic("Expected filename parameter to command missing.");
-	}
-    program_name = argv[1];
-  if ((yyin=fopen(program_name,"r"))==NULL) {
+  if( 2 != argc )
+  {
+    panic("Expected filename parameter to command missing.");
+  }
+  program_name = argv[1];
+  yyin = fopen( program_name,"r" );
+  if( NULL == yyin ) 
+  {
     perror(program_name);
     exit(1);
   }
 	
-  mgInterpreterInit(mg_instruction_table);
+  mgInterpreterInit( mg_instruction_table );
 
   instruction_stack_t *instruction_stack = 
     (instruction_stack_t *)calloc( CODE_SIZE, sizeof(instruction_stack_t) );
   data_stack_t *data_stack = (data_stack_t *)calloc( STACK_SIZE, sizeof(data_stack_t) );
 
 #ifdef MG_DEBUG
- vm_debug = 1;
-vm_out = stderr;
+  vm_debug = 1;
+  vm_out = stderr;
 #endif
 
   vmcodep = instruction_stack;
